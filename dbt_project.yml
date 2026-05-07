@@ -1,0 +1,30 @@
+name: 'sao_sandbox'
+version: '1.0.0'
+config-version: 2
+
+profile: 'sao_sandbox'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Materializations are set at the model level (in each .sql file's config block)
+# to support flexible materialization mixes across all layers.
+# This avoids conflicts between project-level and model-level settings.
+
+models:
+  sao_sandbox:
+    # Handle materialization changes automatically (drop and recreate if type changes)
+    +on_configuration_change: apply
+    staging:
+      +tags: ['staging']
+    intermediate:
+      +tags: ['intermediate']
+    marts:
+      +tags: ['marts']
