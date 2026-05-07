@@ -1,0 +1,111 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: RAW_DATA
+    schema: GLOBAL_SPECIALITY
+    tables:
+      - name: ACCOUNTS
+        description: "Stores commercial and small business policyholder account information for The Hartford"
+        columns:
+          - name: ACCOUNT_ID
+            description: "Unique identifier for each account"
+          - name: ACCOUNT_NAME
+            description: "Legal business name of the policyholder"
+          - name: INDUSTRY_CODE
+            description: "NAICS or SIC industry classification code for the business"
+          - name: ACCOUNT_STATUS
+            description: "Current status of the account"
+          - name: BUSINESS_SEGMENT
+            description: "Hartford business segment the account belongs to"
+      - name: POLICIES
+        description: "Core policy records for all P&C insurance policies written by The Hartford"
+        columns:
+          - name: POLICY_ID
+            description: "Unique identifier for each insurance policy"
+          - name: ACCOUNT_ID
+            description: "Foreign key referencing the account that holds this policy"
+          - name: POLICY_NUMBER
+            description: "Human-readable policy number used in operations"
+          - name: LINE_OF_BUSINESS
+            description: "Type of P&C insurance coverage provided"
+          - name: POLICY_STATUS
+            description: "Current lifecycle status of the policy"
+      - name: POLICY_TERMS
+        description: "Stores term-level details for each policy period including effective dates and financial terms"
+        columns:
+          - name: POLICY_TERM_ID
+            description: "Unique identifier for each policy term"
+          - name: POLICY_ID
+            description: "Foreign key referencing the associated policy"
+          - name: EFFECTIVE_DATE
+            description: "Date the policy term becomes effective"
+          - name: WRITTEN_PREMIUM
+            description: "Total written premium for the policy term in USD"
+          - name: EXPIRATION_DATE
+            description: "Date the policy term expires"
+      - name: CLAIMS
+        description: "Records all first-notice-of-loss and claim lifecycle data for P&C policies"
+        columns:
+          - name: CLAIM_ID
+            description: "Unique identifier for each claim"
+          - name: POLICY_ID
+            description: "Foreign key referencing the policy under which the claim was filed"
+          - name: CLAIM_STATUS
+            description: "Current status of the claim in the adjudication workflow"
+          - name: CAUSE_OF_LOSS
+            description: "Primary cause or peril that triggered the claim"
+          - name: DATE_OF_LOSS
+            description: "Date the loss event occurred"
+      - name: CLAIM_FINANCIALS
+        description: "Tracks incurred losses, paid amounts, and reserves for each claim to support loss ratio calculations"
+        columns:
+          - name: CLAIM_FINANCIAL_ID
+            description: "Unique identifier for each claim financial record"
+          - name: CLAIM_ID
+            description: "Foreign key referencing the associated claim"
+          - name: INCURRED_LOSS
+            description: "Total incurred loss amount including paid and reserved in USD"
+          - name: PAID_LOSS
+            description: "Amount already paid out on the claim in USD"
+          - name: CASE_RESERVE
+            description: "Outstanding reserve set aside for future claim payments in USD"
+      - name: UNDERWRITING_SUBMISSIONS
+        description: "Captures submission and underwriting decision data for new and renewal business"
+        columns:
+          - name: SUBMISSION_ID
+            description: "Unique identifier for each underwriting submission"
+          - name: ACCOUNT_ID
+            description: "Foreign key referencing the account associated with the submission"
+          - name: SUBMISSION_TYPE
+            description: "Whether the submission is new business or a renewal"
+          - name: UNDERWRITING_DECISION
+            description: "Final underwriting outcome for the submission"
+          - name: DISTRIBUTION_CHANNEL
+            description: "Channel through which the submission was received"
+      - name: EXPENSES
+        description: "Tracks underwriting and loss adjustment expenses by policy for combined ratio analysis"
+        columns:
+          - name: EXPENSE_ID
+            description: "Unique identifier for each expense record"
+          - name: POLICY_TERM_ID
+            description: "Foreign key referencing the policy term this expense is associated with"
+          - name: EXPENSE_TYPE
+            description: "Category of the expense incurred"
+          - name: EXPENSE_AMOUNT
+            description: "Dollar amount of the expense in USD"
+          - name: EXPENSE_DATE
+            description: "Date the expense was recorded"
+      - name: REINSURANCE_TREATIES
+        description: "Stores reinsurance treaty details that cede portions of risk to reinsurers, impacting net loss and premium calculations"
+        columns:
+          - name: TREATY_ID
+            description: "Unique identifier for each reinsurance treaty"
+          - name: POLICY_ID
+            description: "Foreign key referencing the policy covered under this treaty"
+          - name: TREATY_TYPE
+            description: "Structure of the reinsurance arrangement"
+          - name: CEDED_PREMIUM
+            description: "Amount of written premium ceded to the reinsurer in USD"
+          - name: CEDED_LOSS
+            description: "Amount of incurred loss recovered from the reinsurer in USD"
