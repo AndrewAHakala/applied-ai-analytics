@@ -1,0 +1,78 @@
+version: 2
+
+# Marts models - final consumption layer including facts, dimensions, and reports
+
+models:
+  - name: dim_policy_terms
+    description: "Marts model: Dim Policy Terms"
+    config:
+      tags: ['marts']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+      - name: policy_terms_validated_policy_id
+        description: "Policy Terms Validated Policy Id"
+      - name: policy_terms_validated_effective_date
+        description: "Policy Terms Validated Effective Date"
+      - name: policy_terms_validated_written_premium
+        description: "Policy Terms Validated Written Premium"
+      - name: policy_terms_validated_expiration_date
+        description: "Policy Terms Validated Expiration Date"
+  - name: agg_policies_weekly
+    description: "Marts model: Agg Policies Weekly"
+    config:
+      tags: ['marts']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+  - name: dim_policies
+    description: "Marts model: Dim Policies"
+    config:
+      tags: ['marts']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+      - name: record_count
+        description: "Record Count"
+      - name: total_ceded_premium
+        description: "Total Ceded Premium"
+      - name: avg_ceded_premium
+        description: "Avg Ceded Premium"
+      - name: total_ceded_loss
+        description: "Total Ceded Loss"
+      - name: avg_ceded_loss
+        description: "Avg Ceded Loss"
+  - name: rpt_accounts_daily
+    description: "Marts model: Rpt Accounts Daily"
+    config:
+      tags: ['marts']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+  - name: fct_accounts
+    description: "Marts model: Fct Accounts"
+    config:
+      tags: ['marts']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
