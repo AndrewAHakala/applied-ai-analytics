@@ -1,0 +1,171 @@
+version: 2
+
+# Staging models - clean, renamed source data
+
+models:
+  - name: stg_accounts
+    description: "Staging model: Stg Accounts"
+    config:
+      tags: ['staging']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_name
+        description: "Account Name"
+      - name: industry_code
+        description: "Industry Code"
+      - name: account_status
+        description: "Account Status"
+      - name: business_segment
+        description: "Business Segment"
+  - name: stg_policies
+    description: "Staging model: Stg Policies"
+    config:
+      tags: ['staging']
+    columns:
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+      - name: policy_number
+        description: "Policy Number"
+      - name: line_of_business
+        description: "Line Of Business"
+      - name: policy_status
+        description: "Policy Status"
+  - name: stg_policy_terms
+    description: "Staging model: Stg Policy Terms"
+    config:
+      tags: ['staging']
+    columns:
+      - name: policy_term_id
+        description: "Policy Term Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+      - name: effective_date
+        description: "Effective Date"
+        data_tests:
+          - not_null
+      - name: written_premium
+        description: "Written Premium"
+      - name: expiration_date
+        description: "Expiration Date"
+        data_tests:
+          - not_null
+  - name: stg_claims
+    description: "Staging model: Stg Claims"
+    config:
+      tags: ['staging']
+    columns:
+      - name: claim_id
+        description: "Claim Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+      - name: claim_status
+        description: "Claim Status"
+      - name: cause_of_loss
+        description: "Cause Of Loss"
+      - name: date_of_loss
+        description: "Date Of Loss"
+        data_tests:
+          - not_null
+  - name: stg_claim_financials
+    description: "Staging model: Stg Claim Financials"
+    config:
+      tags: ['staging']
+    columns:
+      - name: claim_financial_id
+        description: "Claim Financial Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: claim_id
+        description: "Claim Id"
+        data_tests:
+          - not_null
+      - name: incurred_loss
+        description: "Incurred Loss"
+      - name: paid_loss
+        description: "Paid Loss"
+      - name: case_reserve
+        description: "Case Reserve"
+  - name: stg_underwriting_submissions
+    description: "Staging model: Stg Underwriting Submissions"
+    config:
+      tags: ['staging']
+    columns:
+      - name: submission_id
+        description: "Submission Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+      - name: submission_type
+        description: "Submission Type"
+      - name: underwriting_decision
+        description: "Underwriting Decision"
+      - name: distribution_channel
+        description: "Distribution Channel"
+  - name: stg_expenses
+    description: "Staging model: Stg Expenses"
+    config:
+      tags: ['staging']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+        data_tests:
+          - not_null
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+        data_tests:
+          - not_null
+  - name: stg_reinsurance_treaties
+    description: "Staging model: Stg Reinsurance Treaties"
+    config:
+      tags: ['staging']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+      - name: treaty_type
+        description: "Treaty Type"
+      - name: ceded_premium
+        description: "Ceded Premium"
+      - name: ceded_loss
+        description: "Ceded Loss"
