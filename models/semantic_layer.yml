@@ -1,0 +1,91 @@
+version: 2
+
+metrics:
+  - name: claim_frequency
+    description: Ratio of claims to policy terms.
+    type: ratio
+    label: Claim Frequency
+    numerator: claim_count
+    denominator: policy_term_count
+
+  - name: open_claim_ratio
+    description: Ratio of open claims to total claims.
+    type: ratio
+    label: Open Claim Ratio
+    numerator: open_claim_count
+    denominator: claim_count
+
+  - name: closed_claim_ratio
+    description: Ratio of closed claims to total claims.
+    type: ratio
+    label: Closed Claim Ratio
+    numerator: closed_claim_count
+    denominator: claim_count
+
+  - name: paid_to_incurred_ratio
+    description: Ratio of paid loss to incurred loss.
+    type: ratio
+    label: Paid to Incurred Ratio
+    numerator: paid_loss
+    denominator: incurred_loss
+
+  - name: case_reserve_ratio
+    description: Ratio of case reserve to incurred loss.
+    type: ratio
+    label: Case Reserve Ratio
+    numerator: case_reserve
+    denominator: incurred_loss
+
+  - name: average_claim_severity
+    description: Average incurred loss per claim.
+    type: ratio
+    label: Average Claim Severity
+    numerator: incurred_loss
+    denominator: claim_count
+
+  - name: average_paid_severity
+    description: Average paid loss per claim.
+    type: ratio
+    label: Average Paid Severity
+    numerator: paid_loss
+    denominator: claim_count
+
+  - name: large_loss_rate
+    description: Ratio of large loss claims to all claims.
+    type: ratio
+    label: Large Loss Rate
+    numerator: large_loss_count
+    denominator: claim_count
+
+  - name: expense_ratio
+    description: Ratio of expenses to written premium.
+    type: ratio
+    label: Expense Ratio
+    numerator: expense_amount
+    denominator: written_premium
+
+  - name: gross_loss_ratio
+    description: Ratio of incurred loss to written premium.
+    type: ratio
+    label: Gross Loss Ratio
+    numerator: incurred_loss
+    denominator: written_premium
+
+  - name: gross_combined_ratio
+    description: Combined ratio proxy using incurred loss plus expense over written premium.
+    type: derived
+    label: Gross Combined Ratio
+    expr: loss_ratio + exp_ratio
+    input_metrics:
+      - name: gross_loss_ratio
+        alias: loss_ratio
+      - name: expense_ratio
+        alias: exp_ratio
+
+  - name: large_policy_share
+    description: Ratio of large policy terms to all policy terms.
+    type: ratio
+    label: Large Policy Share
+    numerator: large_policy_term_count
+    denominator: policy_term_count
+
