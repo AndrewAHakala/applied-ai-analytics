@@ -1,0 +1,405 @@
+version: 2
+
+# Intermediate models - multi-layer business logic transformations
+
+models:
+  - name: int_reinsurance_treaties_cleaned
+    description: "Intermediate model: Int Reinsurance Treaties Cleaned"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+      - name: treaty_type
+        description: "Treaty Type"
+      - name: ceded_premium
+        description: "Ceded Premium"
+      - name: ceded_loss
+        description: "Ceded Loss"
+  - name: int_policies_filtered
+    description: "Intermediate model: Int Policies Filtered"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Account Id"
+      - name: policy_number
+        description: "Policy Number"
+      - name: line_of_business
+        description: "Line Of Business"
+      - name: policy_status
+        description: "Policy Status"
+  - name: int_policy_terms_validated
+    description: "Intermediate model: Int Policy Terms Validated"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: policy_term_id
+        description: "Policy Term Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+      - name: effective_date
+        description: "Effective Date"
+      - name: written_premium
+        description: "Written Premium"
+      - name: expiration_date
+        description: "Expiration Date"
+  - name: int_underwriting_submissions_enriched
+    description: "Intermediate model: Int Underwriting Submissions Enriched"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: submission_id
+        description: "Submission Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Account Id"
+      - name: submission_type
+        description: "Submission Type"
+      - name: underwriting_decision
+        description: "Underwriting Decision"
+      - name: distribution_channel
+        description: "Distribution Channel"
+  - name: int_expenses_cleaned
+    description: "Intermediate model: Int Expenses Cleaned"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+  - name: int_claims_filtered
+    description: "Intermediate model: Int Claims Filtered"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: claim_id
+        description: "Claim Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+      - name: claim_status
+        description: "Claim Status"
+      - name: cause_of_loss
+        description: "Cause Of Loss"
+      - name: date_of_loss
+        description: "Date Of Loss"
+  - name: int_accounts_validated
+    description: "Intermediate model: Int Accounts Validated"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_name
+        description: "Account Name"
+      - name: industry_code
+        description: "Industry Code"
+      - name: account_status
+        description: "Account Status"
+      - name: business_segment
+        description: "Business Segment"
+  - name: int_claim_financials_enriched
+    description: "Intermediate model: Int Claim Financials Enriched"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: claim_financial_id
+        description: "Claim Financial Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: claim_id
+        description: "Claim Id"
+      - name: incurred_loss
+        description: "Incurred Loss"
+      - name: paid_loss
+        description: "Paid Loss"
+      - name: case_reserve
+        description: "Case Reserve"
+      - name: incurred_loss_category
+        description: "Incurred Loss Category"
+  - name: int_accounts_joined
+    description: "Intermediate model: Int Accounts Joined"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+      - name: policy_terms_validated_policy_id
+        description: "Policy Terms Validated Policy Id"
+      - name: policy_terms_validated_effective_date
+        description: "Policy Terms Validated Effective Date"
+      - name: policy_terms_validated_written_premium
+        description: "Policy Terms Validated Written Premium"
+      - name: policy_terms_validated_expiration_date
+        description: "Policy Terms Validated Expiration Date"
+  - name: int_policies_aggregated
+    description: "Intermediate model: Int Policies Aggregated"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+      - name: record_count
+        description: "Record Count"
+      - name: total_ceded_premium
+        description: "Total Ceded Premium"
+      - name: avg_ceded_premium
+        description: "Avg Ceded Premium"
+      - name: total_ceded_loss
+        description: "Total Ceded Loss"
+      - name: avg_ceded_loss
+        description: "Avg Ceded Loss"
+  - name: int_policy_terms_pivoted
+    description: "Intermediate model: Int Policy Terms Pivoted"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: policy_id
+        description: "Policy Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_id
+        description: "Account Id"
+      - name: policy_number
+        description: "Policy Number"
+      - name: line_of_business
+        description: "Line Of Business"
+      - name: policy_status
+        description: "Policy Status"
+  - name: int_claims_mapped
+    description: "Intermediate model: Int Claims Mapped"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: claim_financial_id
+        description: "Claim Financial Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: claim_id
+        description: "Claim Id"
+      - name: incurred_loss
+        description: "Incurred Loss"
+      - name: paid_loss
+        description: "Paid Loss"
+      - name: case_reserve
+        description: "Case Reserve"
+      - name: incurred_loss_category
+        description: "Incurred Loss Category"
+  - name: int_claim_financials_joined
+    description: "Intermediate model: Int Claim Financials Joined"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+      - name: policy_terms_validated_policy_id
+        description: "Policy Terms Validated Policy Id"
+      - name: policy_terms_validated_effective_date
+        description: "Policy Terms Validated Effective Date"
+      - name: policy_terms_validated_written_premium
+        description: "Policy Terms Validated Written Premium"
+      - name: policy_terms_validated_expiration_date
+        description: "Policy Terms Validated Expiration Date"
+  - name: int_underwriting_submissions_aggregated
+    description: "Intermediate model: Int Underwriting Submissions Aggregated"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: submission_id
+        description: "Submission Id"
+      - name: record_count
+        description: "Record Count"
+  - name: int_expenses_pivoted
+    description: "Intermediate model: Int Expenses Pivoted"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_id
+        description: "Policy Id"
+      - name: treaty_type
+        description: "Treaty Type"
+      - name: ceded_premium
+        description: "Ceded Premium"
+      - name: ceded_loss
+        description: "Ceded Loss"
+  - name: int_reinsurance_treaties_mapped
+    description: "Intermediate model: Int Reinsurance Treaties Mapped"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_name
+        description: "Account Name"
+      - name: industry_code
+        description: "Industry Code"
+      - name: account_status
+        description: "Account Status"
+      - name: business_segment
+        description: "Business Segment"
+  - name: int_accounts_combined
+    description: "Intermediate model: Int Accounts Combined"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+      - name: record_count
+        description: "Record Count"
+      - name: total_ceded_premium
+        description: "Total Ceded Premium"
+      - name: avg_ceded_premium
+        description: "Avg Ceded Premium"
+      - name: total_ceded_loss
+        description: "Total Ceded Loss"
+      - name: avg_ceded_loss
+        description: "Avg Ceded Loss"
+  - name: int_policies_transformed
+    description: "Intermediate model: Int Policies Transformed"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: claim_financial_id
+        description: "Claim Financial Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: claim_id
+        description: "Claim Id"
+      - name: incurred_loss
+        description: "Incurred Loss"
+      - name: paid_loss
+        description: "Paid Loss"
+      - name: case_reserve
+        description: "Case Reserve"
+      - name: incurred_loss_category
+        description: "Incurred Loss Category"
+      - name: incurred_loss_category_normalized
+        description: "Incurred Loss Category Normalized"
+      - name: incurred_loss_rounded
+        description: "Incurred Loss Rounded"
+  - name: int_policy_terms_calculated
+    description: "Intermediate model: Int Policy Terms Calculated"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: account_id
+        description: "Account Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: account_name
+        description: "Account Name"
+      - name: industry_code
+        description: "Industry Code"
+      - name: account_status
+        description: "Account Status"
+      - name: business_segment
+        description: "Business Segment"
+  - name: int_claims_derived
+    description: "Intermediate model: Int Claims Derived"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: expense_id
+        description: "Expense Id"
+        data_tests:
+          - not_null
+          - unique
+      - name: policy_term_id
+        description: "Policy Term Id"
+      - name: expense_type
+        description: "Expense Type"
+      - name: expense_amount
+        description: "Expense Amount"
+      - name: expense_date
+        description: "Expense Date"
+      - name: policy_terms_validated_policy_id
+        description: "Policy Terms Validated Policy Id"
+      - name: policy_terms_validated_effective_date
+        description: "Policy Terms Validated Effective Date"
+      - name: policy_terms_validated_written_premium
+        description: "Policy Terms Validated Written Premium"
+      - name: policy_terms_validated_expiration_date
+        description: "Policy Terms Validated Expiration Date"
+  - name: int_claim_financials_combined
+    description: "Intermediate model: Int Claim Financials Combined"
+    config:
+      tags: ['intermediate']
+    columns:
+      - name: treaty_id
+        description: "Treaty Id"
+      - name: record_count
+        description: "Record Count"
+      - name: total_ceded_premium
+        description: "Total Ceded Premium"
+      - name: avg_ceded_premium
+        description: "Avg Ceded Premium"
+      - name: total_ceded_loss
+        description: "Total Ceded Loss"
+      - name: avg_ceded_loss
+        description: "Avg Ceded Loss"
