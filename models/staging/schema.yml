@@ -121,25 +121,40 @@ models:
           type: time
     metrics:
       - name: written_premium
-        description: Total written premium.
+        description: |
+          Total premium written across in-force policy terms.
+          Common slices: line_of_business, account_name, business_segment, industry_code, state, metric_time.
+          Example questions: "written premium by line of business", "top 10 accounts by premium",
+          "premium trend by quarter".
+          Also known as: WP, gross written premium, GWP, premium dollars.
         type: simple
         label: Written Premium
         agg: sum
         expr: written_premium
       - name: policy_term_count
-        description: Count of policy terms.
+        description: |
+          Count of policy terms (one row per policy x term).
+          Common slices: line_of_business, business_segment, industry_code, policy_status.
+          Example questions: "policy term count by line of business".
         type: simple
         label: Policy Term Count
         agg: count
         expr: 1
       - name: average_written_premium
-        description: Average written premium per policy term.
+        description: |
+          Average written premium per policy term (total WP / policy term count).
+          Common slices: line_of_business, business_segment, industry_code.
+          Example questions: "average premium by line of business", "average premium per policy".
+          Also known as: average WP, avg premium per policy.
         type: simple
         label: Average Written Premium
         agg: average
         expr: written_premium
       - name: large_policy_term_count
-        description: Count of policy terms with large premium.
+        description: |
+          Count of policy terms classified as LARGE by premium size.
+          Common slices: line_of_business, business_segment.
+          Example questions: "how many large policies by line of business".
         type: simple
         label: Large Policy Term Count
         agg: count
@@ -281,19 +296,26 @@ models:
           type: time
     metrics:
       - name: expense_amount
-        description: Total expense amount.
+        description: |
+          Total expense amount.
+          Common slices: expense_type, line_of_business (via policy_term__policy__line_of_business), metric_time.
+          Example questions: "expenses by type", "expense trend by quarter".
         type: simple
         label: Expense Amount
         agg: sum
         expr: expense_amount
       - name: expense_count
-        description: Count of expense records.
+        description: |
+          Count of expense records.
+          Common slices: expense_type, line_of_business.
         type: simple
         label: Expense Count
         agg: count
         expr: 1
       - name: average_expense_amount
-        description: Average expense amount.
+        description: |
+          Average expense per expense record.
+          Common slices: expense_type, line_of_business.
         type: simple
         label: Average Expense Amount
         agg: average

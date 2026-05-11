@@ -1,0 +1,105 @@
+# Apply to the Hartford dbt project at:
+#   models/semantic_models/saved_queries.yml
+#
+# After `dbt parse` + redeploy, these eight saved queries show up at the top
+# of the Copilot's left sidebar as deterministic one-click buttons. They run
+# via the SL GraphQL `createSynchronousQuery(savedQuery: <name>)` call — no
+# Cortex round-trip, no LLM variance, sub-second responses.
+
+saved_queries:
+
+  - name: written_premium_by_lob_ytd
+    label: Written premium by line of business — YTD
+    description: |
+      Total written premium across in-force policies, year-to-date, sliced
+      by line of business.
+    query_params:
+      metrics:
+        - written_premium
+      group_by:
+        - Dimension('policy__line_of_business')
+      where:
+        - "{{ TimeDimension('metric_time', 'DAY') }} >= DATE_TRUNC('year', CURRENT_DATE())"
+
+  - name: gross_loss_ratio_by_lob_ytd
+    label: Gross loss ratio by line of business — YTD
+    description: |
+      Gross loss ratio (incurred loss / earned premium) by line of business,
+      year-to-date.
+    query_params:
+      metrics:
+        - gross_loss_ratio
+      group_by:
+        - Dimension('policy__line_of_business')
+      where:
+        - "{{ TimeDimension('metric_time', 'DAY') }} >= DATE_TRUNC('year', CURRENT_DATE())"
+
+  - name: claim_frequency_by_lob_trailing_12m
+    label: Claim frequency by line of business — trailing 12 months
+    description: |
+      Claims per policy term by line of business over the last 12 months.
+    query_params:
+      metrics:
+        - claim_frequency
+      group_by:
+        - Dimension('policy__line_of_business')
+      where:
+        - "{{ TimeDimension('metric_time', 'DAY') }} >= DATEADD('month', -12, CURRENT_DATE())"
+
+  - name: top_10_accounts_by_premium
+    label: Top 10 accounts by written premium — this year
+    description: |
+      Top 10 insured accounts ranked by written premium for the current year.
+    query_params:
+      metrics:
+        - written_premium
+      group_by:
+        - Dimension('policy__account__account_name')
+      order_by:
+        - Metric('written_premium', descending=True)
+      limit: 10
+      where:
+        - "{{ TimeDimension('metric_time', 'DAY') }} >= DATE_TRUNC('year', CURRENT_DATE())"
+
+  - name: paid_severity_by_cause
+    label: Average paid severity by cause of loss
+    description: |
+      Average paid loss per closed claim, sliced by cause of loss.
+    query_params:
+      metrics:
+        - average_paid_severity
+      group_by:
+        - Dimension('claim__cause_of_loss')
+
+  - name: large_loss_rate_by_segment
+    label: Large loss rate by business segment
+    description: |
+      Share of claims classified as large losses, by business segment.
+    query_params:
+      metrics:
+        - large_loss_rate
+      group_by:
+        - Dimension('policy__account__business_segment')
+
+  - name: open_claim_ratio_by_lob
+    label: Open claim ratio by line of business
+    description: |
+      Share of claims currently OPEN by line of business — backlog signal.
+    query_params:
+      metrics:
+        - open_claim_ratio
+      group_by:
+        - Dimension('policy__line_of_business')
+
+  - name: combined_ratio_trend_4q
+    label: Gross combined ratio — last 4 quarters
+    description: |
+      Headline portfolio profitability metric (gross loss ratio + expense ratio)
+      across the last four quarters.
+    query_params:
+      metrics:
+        - gross_combined_ratio
+      group_by:
+        - TimeDimension('metric_time', 'QUARTER')
+      where:
+        - "{{ TimeDimension('metric_time', 'DAY') }} >= DATEADD('quarter', -4, DATE_TRUNC('quarter', CURRENT_DATE()))"
