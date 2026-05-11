@@ -122,13 +122,21 @@ models:
         description: Case reserve amount.
     metrics:
       - name: claim_count
-        description: Count of claims.
+        description: |
+          Total count of claims.
+          Common slices: line_of_business, cause_of_loss, claim_status, severity_band, account_name, metric_time.
+          Example questions: "how many claims by line of business", "claim count for ACME",
+          "claims by cause of loss".
+          Also known as: number of claims, total claims.
         type: simple
         label: Claim Count
         agg: count
         expr: 1
       - name: open_claim_count
-        description: Count of open claims.
+        description: |
+          Count of claims with status OPEN.
+          Common slices: line_of_business, cause_of_loss, severity_band.
+          Example questions: "open claims by line of business", "open claim count by cause of loss".
         type: simple
         label: Open Claim Count
         agg: count
@@ -136,7 +144,10 @@ models:
         filter: |
           {{ Dimension('claim__claim_status') }} = 'Open'
       - name: closed_claim_count
-        description: Count of closed claims.
+        description: |
+          Count of claims with status CLOSED.
+          Common slices: line_of_business, cause_of_loss, business_segment.
+          Example questions: "closed claims by cause of loss".
         type: simple
         label: Closed Claim Count
         agg: count
@@ -144,37 +155,59 @@ models:
         filter: |
           {{ Dimension('claim__claim_status') }} = 'Closed'
       - name: incurred_loss
-        description: Total incurred loss amount.
+        description: |
+          Total incurred loss (paid loss + case reserve).
+          Common slices: line_of_business, cause_of_loss, severity_band, account_name.
+          Example questions: "incurred loss by cause of loss", "incurred losses for ACME".
+          Also known as: total loss, gross incurred loss.
         type: simple
         label: Incurred Loss
         agg: sum
         expr: incurred_loss
       - name: paid_loss
-        description: Total paid loss amount.
+        description: |
+          Total paid loss (cash payments on claims).
+          Common slices: line_of_business, cause_of_loss, severity_band, metric_time.
+          Example questions: "paid loss trend", "paid losses by cause of loss".
+          Also known as: cash loss, indemnity paid.
         type: simple
         label: Paid Loss
         agg: sum
         expr: paid_loss
       - name: case_reserve
-        description: Total case reserve amount.
+        description: |
+          Total case reserve dollars across open claims.
+          Common slices: line_of_business, cause_of_loss, severity_band, metric_time.
+          Example questions: "case reserve by line of business", "reserves by cause of loss".
+          Also known as: open reserves, claim reserves.
         type: simple
         label: Case Reserve
         agg: sum
         expr: case_reserve
       - name: average_incurred_loss
-        description: Average incurred loss per claim.
+        description: |
+          Average incurred loss per claim (incurred / claim count).
+          Common slices: line_of_business, cause_of_loss, severity_band.
+          Example questions: "average incurred loss by line of business".
         type: simple
         label: Average Incurred Loss
         agg: average
         expr: incurred_loss
       - name: average_paid_loss
-        description: Average paid loss per claim.
+        description: |
+          Average paid loss per closed claim.
+          Common slices: line_of_business, cause_of_loss, severity_band.
+          Example questions: "average paid loss by line of business".
+          Also known as: average payout, mean paid loss.
         type: simple
         label: Average Paid Loss
         agg: average
         expr: paid_loss
       - name: large_loss_count
-        description: Count of claims with high or catastrophic severity.
+        description: |
+          Count of claims classified as LARGE (high or catastrophic severity band).
+          Common slices: line_of_business, cause_of_loss, business_segment.
+          Example questions: "how many large losses by line of business".
         type: simple
         label: Large Loss Count
         agg: count

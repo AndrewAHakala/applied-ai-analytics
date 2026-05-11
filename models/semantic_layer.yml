@@ -2,77 +2,122 @@ version: 2
 
 metrics:
   - name: claim_frequency
-    description: Ratio of claims to policy terms.
+    description: |
+      Claims per policy term — how often policies file claims.
+      Common slices: line_of_business, business_segment, industry_code, metric_time.
+      Example questions: "claim frequency by line of business", "frequency by industry".
+      Also known as: frequency, claims-per-policy, attritional frequency.
     type: ratio
     label: Claim Frequency
     numerator: claim_count
     denominator: policy_term_count
 
   - name: open_claim_ratio
-    description: Ratio of open claims to total claims.
+    description: |
+      Share of claims currently OPEN — claims backlog signal.
+      Common slices: line_of_business, business_segment, industry_code.
+      Example questions: "open claim ratio by line of business", "backlog by business segment".
+      Also known as: backlog ratio, in-flight claim share.
     type: ratio
     label: Open Claim Ratio
     numerator: open_claim_count
     denominator: claim_count
 
   - name: closed_claim_ratio
-    description: Ratio of closed claims to total claims.
+    description: |
+      Share of claims that are CLOSED — claim resolution rate.
+      Common slices: line_of_business, business_segment.
+      Example questions: "closed claim ratio by line of business".
     type: ratio
     label: Closed Claim Ratio
     numerator: closed_claim_count
     denominator: claim_count
 
   - name: paid_to_incurred_ratio
-    description: Ratio of paid loss to incurred loss.
+    description: |
+      Paid loss divided by incurred loss — how much of incurred is already paid (cash settlement progress).
+      Common slices: line_of_business, severity_band, metric_time.
+      Example questions: "paid-to-incurred ratio trend".
+      Also known as: cash-out ratio, paid ratio.
     type: ratio
     label: Paid to Incurred Ratio
     numerator: paid_loss
     denominator: incurred_loss
 
   - name: case_reserve_ratio
-    description: Ratio of case reserve to incurred loss.
+    description: |
+      Case reserve divided by incurred loss — share of incurred loss not yet paid out.
+      Common slices: line_of_business, severity_band, metric_time.
+      Example questions: "case reserve ratio trend", "reserve ratio by line of business".
     type: ratio
     label: Case Reserve Ratio
     numerator: case_reserve
     denominator: incurred_loss
 
   - name: average_claim_severity
-    description: Average incurred loss per claim.
+    description: |
+      Average incurred loss per claim — how big a typical claim is.
+      Common slices: line_of_business, cause_of_loss, severity_band.
+      Example questions: "average claim severity by cause of loss", "severity by LoB".
+      Also known as: mean severity, incurred severity.
     type: ratio
     label: Average Claim Severity
     numerator: incurred_loss
     denominator: claim_count
 
   - name: average_paid_severity
-    description: Average paid loss per claim.
+    description: |
+      Average paid loss per closed claim — how expensive resolved claims are.
+      Common slices: line_of_business, cause_of_loss, severity_band, business_segment.
+      Example questions: "paid severity by cause of loss", "severity trend by quarter".
+      Also known as: closed claim severity, mean paid severity.
     type: ratio
     label: Average Paid Severity
     numerator: paid_loss
     denominator: claim_count
 
   - name: large_loss_rate
-    description: Ratio of large loss claims to all claims.
+    description: |
+      Share of claims classified as large losses.
+      Common slices: line_of_business, business_segment, industry_code, account_name.
+      Example questions: "large loss rate by business segment", "large loss share by line of business".
+      Also known as: large loss share, severe loss rate.
     type: ratio
     label: Large Loss Rate
     numerator: large_loss_count
     denominator: claim_count
 
   - name: expense_ratio
-    description: Ratio of expenses to written premium.
+    description: |
+      Expense amount divided by written premium.
+      Common slices: line_of_business, business_segment, metric_time.
+      Example questions: "expense ratio by line of business", "expense ratio trend".
+      Also known as: expense load.
     type: ratio
     label: Expense Ratio
     numerator: expense_amount
     denominator: written_premium
 
   - name: gross_loss_ratio
-    description: Ratio of incurred loss to written premium.
+    description: |
+      Gross loss ratio — incurred loss divided by earned premium (gross of reinsurance).
+      Common slices: line_of_business, business_segment, industry_code, account_name, metric_time.
+      Example questions: "loss ratio by line of business", "loss ratio trend by quarter",
+      "which business segment has the worst loss ratio".
+      Also known as: loss ratio, loss-to-premium, incurred-to-earned, gross LR.
     type: ratio
     label: Gross Loss Ratio
     numerator: incurred_loss
     denominator: written_premium
 
   - name: gross_combined_ratio
-    description: Combined ratio proxy using incurred loss plus expense over written premium.
+    description: |
+      Headline portfolio profitability metric — gross loss ratio plus expense ratio.
+      Combined ratio < 100% means the portfolio is profitable on an underwriting basis.
+      Common slices: metric_time (this metric is derived from inputs that share only the time
+      dimension, so only time-based slices are supported today).
+      Example questions: "combined ratio trend", "combined ratio over the last 4 quarters".
+      Also known as: combined ratio, CR, GCR.
     type: derived
     label: Gross Combined Ratio
     expr: loss_ratio + exp_ratio
@@ -83,9 +128,12 @@ metrics:
         alias: exp_ratio
 
   - name: large_policy_share
-    description: Ratio of large policy terms to all policy terms.
+    description: |
+      Share of policy terms classified as LARGE by premium size.
+      Common slices: line_of_business, business_segment, industry_code.
+      Example questions: "large policy share by business segment".
+      Also known as: large-account share, large-risk share.
     type: ratio
     label: Large Policy Share
     numerator: large_policy_term_count
     denominator: policy_term_count
-
