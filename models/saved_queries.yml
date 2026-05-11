@@ -1,10 +1,8 @@
-# Apply to the Hartford dbt project at:
-#   models/semantic_models/saved_queries.yml
+# Saved queries for common semantic layer questions.
 #
-# After `dbt parse` + redeploy, these eight saved queries show up at the top
-# of the Copilot's left sidebar as deterministic one-click buttons. They run
-# via the SL GraphQL `createSynchronousQuery(savedQuery: <name>)` call — no
-# Cortex round-trip, no LLM variance, sub-second responses.
+# These definitions stick to the query_params fields that parse cleanly in this
+# Fusion project: metrics, group_by, and where. Any ordering, ranking, or row
+# limiting needs to be applied by the consuming tool at query time.
 
 saved_queries:
 
@@ -46,18 +44,17 @@ saved_queries:
       where:
         - "{{ TimeDimension('metric_time', 'DAY') }} >= DATEADD('month', -12, CURRENT_DATE())"
 
-  - name: top_10_accounts_by_premium
-    label: Top 10 accounts by written premium — this year
+  - name: accounts_by_premium_ytd
+
+    label: Accounts by written premium — this year
     description: |
-      Top 10 insured accounts ranked by written premium for the current year.
+      Written premium by insured account for the current year.
+      Ranking or top-N filtering should be applied by the consuming tool.
     query_params:
       metrics:
         - written_premium
       group_by:
-        - Dimension('policy__account__account_name')
-      order_by:
-        - Metric('written_premium', descending=True)
-      limit: 10
+        - Dimension('account__account_name')
       where:
         - "{{ TimeDimension('metric_time', 'DAY') }} >= DATE_TRUNC('year', CURRENT_DATE())"
 
@@ -79,7 +76,7 @@ saved_queries:
       metrics:
         - large_loss_rate
       group_by:
-        - Dimension('policy__account__business_segment')
+        - Dimension('account__business_segment')
 
   - name: open_claim_ratio_by_lob
     label: Open claim ratio by line of business
