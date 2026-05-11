@@ -4,168 +4,330 @@ version: 2
 
 models:
   - name: stg_accounts
-    description: "Staging model: Stg Accounts"
+    description: Account-level semantic model for insureds and policyholders.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: accounts
     columns:
       - name: account_id
-        description: "Account Id"
+        description: Account entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: account
       - name: account_name
-        description: "Account Name"
+        description: Legal account name.
+        dimension:
+          type: categorical
       - name: industry_code
-        description: "Industry Code"
+        description: Industry classification code.
+        dimension:
+          type: categorical
       - name: account_status
-        description: "Account Status"
+        description: Current account lifecycle status.
+        dimension:
+          type: categorical
       - name: business_segment
-        description: "Business Segment"
+        description: Business segment for the account.
+        dimension:
+          type: categorical
+
   - name: stg_policies
-    description: "Staging model: Stg Policies"
+    description: Policy-level semantic model for active and historical policies.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: policies
     columns:
       - name: policy_id
-        description: "Policy Id"
+        description: Policy entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: policy
       - name: account_id
-        description: "Account Id"
+        description: Parent account key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: account
       - name: policy_number
-        description: "Policy Number"
+        description: Operational policy number.
+        dimension:
+          type: categorical
       - name: line_of_business
-        description: "Line Of Business"
+        description: Coverage line written on the policy.
+        dimension:
+          type: categorical
       - name: policy_status
-        description: "Policy Status"
+        description: Current policy status.
+        dimension:
+          type: categorical
+
+
   - name: stg_policy_terms
-    description: "Staging model: Stg Policy Terms"
+    description: Policy-term semantic model for premium and policy-period analysis.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: policy_terms
+    agg_time_dimension: effective_date
+    derived_semantics:
+      dimensions:
+        - name: premium_size_band
+          type: categorical
+          expr: "case when written_premium < 1000 then 'small' when written_premium < 10000 then 'mid' when written_premium < 50000 then 'large' else 'xlarge' end"
+          label: Premium Size Band
     columns:
       - name: policy_term_id
-        description: "Policy Term Id"
+        description: Policy term entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: policy_term
       - name: policy_id
-        description: "Policy Id"
+        description: Parent policy key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: policy
       - name: effective_date
-        description: "Effective Date"
+        description: Policy term effective date.
         data_tests:
           - not_null
+        granularity: day
+        dimension:
+          type: time
       - name: written_premium
-        description: "Written Premium"
+        description: Written premium for the policy term.
       - name: expiration_date
-        description: "Expiration Date"
+        description: Policy term expiration date.
         data_tests:
           - not_null
+        granularity: day
+        dimension:
+          type: time
+    metrics:
+      - name: written_premium
+        description: Total written premium.
+        type: simple
+        label: Written Premium
+        agg: sum
+        expr: written_premium
+      - name: policy_term_count
+        description: Count of policy terms.
+        type: simple
+        label: Policy Term Count
+        agg: count
+        expr: 1
+      - name: average_written_premium
+        description: Average written premium per policy term.
+        type: simple
+        label: Average Written Premium
+        agg: average
+        expr: written_premium
+      - name: large_policy_term_count
+        description: Count of policy terms with large premium.
+        type: simple
+        label: Large Policy Term Count
+        agg: count
+        expr: 1
+        filter: |
+          {{ Dimension('policy_term__premium_size_band') }} in ('large', 'xlarge')
+
   - name: stg_claims
-    description: "Staging model: Stg Claims"
+    description: Staging model for claims data.
     config:
       tags: ['staging']
     columns:
       - name: claim_id
-        description: "Claim Id"
+        description: Claim entity key.
         data_tests:
           - not_null
           - unique
       - name: policy_id
-        description: "Policy Id"
+        description: Parent policy key.
         data_tests:
           - not_null
       - name: claim_status
-        description: "Claim Status"
+        description: Current claim lifecycle status.
       - name: cause_of_loss
-        description: "Cause Of Loss"
+        description: Primary cause of loss.
       - name: date_of_loss
-        description: "Date Of Loss"
+        description: Date the loss occurred.
         data_tests:
           - not_null
+
   - name: stg_claim_financials
-    description: "Staging model: Stg Claim Financials"
+    description: Claim financial semantic model for severity and reserve analysis.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: claim_financials
+    derived_semantics:
+      dimensions:
+        - name: severity_band
+          type: categorical
+          expr: "case when incurred_loss < 10000 then 'low' when incurred_loss < 50000 then 'medium' when incurred_loss < 250000 then 'high' else 'catastrophic' end"
+          label: Severity Band
     columns:
       - name: claim_financial_id
-        description: "Claim Financial Id"
+        description: Claim financial entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: claim_financial
       - name: claim_id
-        description: "Claim Id"
+        description: Parent claim key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: claim
       - name: incurred_loss
-        description: "Incurred Loss"
+        description: Total incurred loss amount.
       - name: paid_loss
-        description: "Paid Loss"
+        description: Total paid loss amount.
       - name: case_reserve
-        description: "Case Reserve"
+        description: Total case reserve amount.
+
   - name: stg_underwriting_submissions
-    description: "Staging model: Stg Underwriting Submissions"
+    description: Submission semantic model for underwriting navigation and slicing.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: underwriting_submissions
     columns:
       - name: submission_id
-        description: "Submission Id"
+        description: Submission entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: submission
       - name: account_id
-        description: "Account Id"
+        description: Parent account key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: account
       - name: submission_type
-        description: "Submission Type"
+        description: Submission type such as new or renewal.
+        dimension:
+          type: categorical
       - name: underwriting_decision
-        description: "Underwriting Decision"
+        description: Final underwriting decision.
+        dimension:
+          type: categorical
       - name: distribution_channel
-        description: "Distribution Channel"
+        description: Distribution channel.
+        dimension:
+          type: categorical
+
   - name: stg_expenses
-    description: "Staging model: Stg Expenses"
+    description: Expense semantic model for expense and combined-ratio style analysis.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: expenses
+    agg_time_dimension: expense_date
     columns:
       - name: expense_id
-        description: "Expense Id"
+        description: Expense entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: expense
       - name: policy_term_id
-        description: "Policy Term Id"
+        description: Parent policy term key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: policy_term
       - name: expense_type
-        description: "Expense Type"
+        description: Expense category.
+        dimension:
+          type: categorical
       - name: expense_amount
-        description: "Expense Amount"
+        description: Expense amount.
       - name: expense_date
-        description: "Expense Date"
+        description: Expense booking date.
         data_tests:
           - not_null
+        granularity: day
+        dimension:
+          type: time
+    metrics:
+      - name: expense_amount
+        description: Total expense amount.
+        type: simple
+        label: Expense Amount
+        agg: sum
+        expr: expense_amount
+      - name: expense_count
+        description: Count of expense records.
+        type: simple
+        label: Expense Count
+        agg: count
+        expr: 1
+      - name: average_expense_amount
+        description: Average expense amount.
+        type: simple
+        label: Average Expense Amount
+        agg: average
+        expr: expense_amount
+
   - name: stg_reinsurance_treaties
-    description: "Staging model: Stg Reinsurance Treaties"
+    description: Reinsurance semantic model for treaty-level slicing and joins.
     config:
       tags: ['staging']
+    semantic_model:
+      enabled: true
+      name: reinsurance_treaties
     columns:
       - name: treaty_id
-        description: "Treaty Id"
+        description: Treaty entity key.
         data_tests:
           - not_null
           - unique
+        entity:
+          type: primary
+          name: treaty
       - name: policy_id
-        description: "Policy Id"
+        description: Parent policy key.
         data_tests:
           - not_null
+        entity:
+          type: foreign
+          name: policy
       - name: treaty_type
-        description: "Treaty Type"
+        description: Treaty arrangement type.
+        dimension:
+          type: categorical
       - name: ceded_premium
-        description: "Ceded Premium"
+        description: Total premium ceded to reinsurers.
       - name: ceded_loss
-        description: "Ceded Loss"
+        description: Total loss ceded to reinsurers.
+

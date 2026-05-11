@@ -76,3 +76,123 @@ models:
         data_tests:
           - not_null
           - unique
+  - name: fct_claims
+    description: Claim fact model joining claim events to claim financial measures for time-based semantic analysis.
+    config:
+      tags: ['marts']
+    semantic_model:
+      enabled: true
+      name: claims
+    agg_time_dimension: date_of_loss
+    derived_semantics:
+      dimensions:
+        - name: severity_band
+          type: categorical
+          expr: "case when incurred_loss < 10000 then 'low' when incurred_loss < 50000 then 'medium' when incurred_loss < 250000 then 'high' else 'catastrophic' end"
+          label: Severity Band
+    columns:
+      - name: claim_id
+        description: Claim entity key.
+        entity:
+          type: primary
+          name: claim
+      - name: policy_id
+        description: Parent policy key.
+        entity:
+          type: foreign
+          name: policy
+      - name: claim_status
+        description: Current claim lifecycle status.
+        dimension:
+          type: categorical
+      - name: cause_of_loss
+        description: Primary cause of loss.
+        dimension:
+          type: categorical
+      - name: date_of_loss
+        description: Date the loss occurred.
+        granularity: day
+        dimension:
+          type: time
+      - name: incurred_loss
+        description: Incurred loss amount.
+      - name: paid_loss
+        description: Paid loss amount.
+      - name: case_reserve
+        description: Case reserve amount.
+    metrics:
+      - name: claim_count
+        description: Count of claims.
+        type: simple
+        label: Claim Count
+        agg: count
+        expr: 1
+      - name: open_claim_count
+        description: Count of open claims.
+        type: simple
+        label: Open Claim Count
+        agg: count
+        expr: 1
+        filter: |
+          {{ Dimension('claim__claim_status') }} = 'Open'
+      - name: closed_claim_count
+        description: Count of closed claims.
+        type: simple
+        label: Closed Claim Count
+        agg: count
+        expr: 1
+        filter: |
+          {{ Dimension('claim__claim_status') }} = 'Closed'
+      - name: incurred_loss
+        description: Total incurred loss amount.
+        type: simple
+        label: Incurred Loss
+        agg: sum
+        expr: incurred_loss
+      - name: paid_loss
+        description: Total paid loss amount.
+        type: simple
+        label: Paid Loss
+        agg: sum
+        expr: paid_loss
+      - name: case_reserve
+        description: Total case reserve amount.
+        type: simple
+        label: Case Reserve
+        agg: sum
+        expr: case_reserve
+      - name: average_incurred_loss
+        description: Average incurred loss per claim.
+        type: simple
+        label: Average Incurred Loss
+        agg: average
+        expr: incurred_loss
+      - name: average_paid_loss
+        description: Average paid loss per claim.
+        type: simple
+        label: Average Paid Loss
+        agg: average
+        expr: paid_loss
+      - name: large_loss_count
+        description: Count of claims with high or catastrophic severity.
+        type: simple
+        label: Large Loss Count
+        agg: count
+        expr: 1
+        filter: |
+          {{ Dimension('claim__severity_band') }} in ('high', 'catastrophic')
+
+
+
+
+  - name: time_spine_daily
+    description: Daily time spine for MetricFlow and semantic layer time-based joins.
+    config:
+      tags: ['marts']
+    time_spine:
+      standard_granularity_column: date_day
+    columns:
+      - name: date_day
+        description: Base day column for the semantic layer time spine.
+        granularity: day
+
